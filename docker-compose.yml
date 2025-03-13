@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  user-service:
+    build: ../user-service
+    container_name: user-service
+    ports:
+      - "50052:50052"
+    depends_on:
+      - notification-service

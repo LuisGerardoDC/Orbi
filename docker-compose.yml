@@ -8,3 +8,19 @@ services:
       - "50052:50052"
     depends_on:
       - notification-service
+
+  notification-service:
+    build: ./Notification_Service/
+    container_name: notification-service
+    ports:
+      - "50051:50051"
+    depends_on:
+      - rabbitmq
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+

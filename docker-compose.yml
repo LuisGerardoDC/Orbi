@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   user-service:
-    build: ../user-service
+    build: ./User_Service
     container_name: user-service
     ports:
       - "50052:50052"

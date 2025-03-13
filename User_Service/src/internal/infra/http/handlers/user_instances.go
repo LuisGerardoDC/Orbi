@@ -2,13 +2,16 @@ package handlers
 
 import (
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/app/usecase"
-	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
+	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/utils"
 )
 
 var (
+	// database
+	dbConnection = utils.ConnectDB()
+
 	// UseCase
 	userUseCases = usecase.UserUseCase{
-		DB: make(map[string]entity.User),
+		DB: dbConnection,
 	}
 
 	// Handlers

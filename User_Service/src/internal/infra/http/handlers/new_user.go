@@ -10,7 +10,7 @@ type NewUserHandler struct {
 	useCase usecase.UserUseCase
 }
 
-func (h *NewUserHandler) CreateUser(c *gin.Context) {
+func (h *NewUserHandler) Handle(c *gin.Context) {
 	var newUser entity.UserRequest
 
 	if err := c.ShouldBindBodyWithJSON(&newUser); err != nil {

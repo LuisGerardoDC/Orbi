@@ -8,7 +8,13 @@
             "request": "launch",
             "mode": "debug",
             "program": "/home/luis/Escritorio/Orbi/Orbi/User_Service/src/cmd/server/main.go",
-            "env": {},
+            "env": {
+                "MYSQL_HOST":"mysql",
+                "MYSQL_PORT":"3306",
+                "MYSQL_USER":"orbiappuser",
+                "MYSQL_PASSWORD":"apppassword",
+                "MYSQL_DATABASE":"usersdb"
+            },
             "args": [],
             "showLog": true
         }

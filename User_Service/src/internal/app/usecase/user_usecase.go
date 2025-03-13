@@ -1,51 +1,53 @@
 package usecase
 
 import (
-	"errors"
+	"database/sql"
 
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
 )
 
 type UserUseCase struct {
-	DB map[string]entity.User
+	DB *sql.DB
 }
 
 func (uc *UserUseCase) CreateUser(user entity.UserRequest) error {
-	if _, exists := uc.DB[user.Email]; exists {
-		return errors.New("usuario ya existe")
-	}
-	uc.DB[user.Email] = entity.User{
-		ID:    len(uc.DB),
-		Name:  user.Name,
-		Email: user.Email,
-	}
+	insertQuery := `INSERT INTO users (name, email) VALUES ($1, $2)`
 
+	_, err := uc.DB.Exec(insertQuery, user.Name, user.Email)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (uc *UserUseCase) GetUser(email string) (entity.User, error) {
-	user, exists := uc.DB[email]
-	if !exists {
-		return entity.User{}, errors.New("usuario no encontrado")
+func (uc *UserUseCase) GetUser(id string) (*entity.User, error) {
+	var (
+		selectQuery = `SELECT name, email FROM users WHERE userid = $1`
+		user        = entity.User{}
+	)
+
+	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.Name, &user.Email)
+	if err != nil {
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (uc *UserUseCase) UpdateUser(user entity.UserRequest) error {
-	if _, exists := uc.DB[user.Email]; !exists {
-		return errors.New("usuario no encontrado")
-	}
-	uc.DB[user.Email] = entity.User{
-		Name:  user.Name,
-		Email: user.Email,
+	updateQuery := `UPDATE users SET name = $1, email = $2 WHERE userid = $3`
+
+	_, err := uc.DB.Exec(updateQuery, user.Name, user.Email, user.ID)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (uc *UserUseCase) DeleteUser(id string) error {
-	if _, exists := uc.DB[id]; !exists {
-		return errors.New("usuario no encontrado")
+	deleteQuery := `UPDATE users SET deleted_at = UTC_TIMESTAMP() WHERE userid = $1`
+	_, err := uc.DB.Exec(deleteQuery, id)
+	if err != nil {
+		return err
 	}
-	delete(uc.DB, id)
 	return nil
 }

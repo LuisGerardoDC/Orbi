@@ -6,6 +6,7 @@ services:
     container_name: user-service
     ports:
       - "50052:50052"
+      - "8080:8080"
     depends_on:
       - notification-service
 

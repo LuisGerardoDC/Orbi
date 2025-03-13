@@ -6,11 +6,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type NewUserHandler struct {
+type UpdateUserHandler struct {
 	useCase usecase.UserUseCase
 }
 
-func (h *NewUserHandler) CreateUser(c *gin.Context) {
+func (h *UpdateUserHandler) Handle(c *gin.Context) {
 	var newUser entity.UserRequest
 
 	if err := c.ShouldBindBodyWithJSON(&newUser); err != nil {
@@ -21,7 +21,7 @@ func (h *NewUserHandler) CreateUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.useCase.CreateUser(newUser); err != nil {
+	if err := h.useCase.UpdateUser(newUser); err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,
 			Message: err.Error(),

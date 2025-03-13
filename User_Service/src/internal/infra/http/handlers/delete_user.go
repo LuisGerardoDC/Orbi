@@ -6,22 +6,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type NewUserHandler struct {
+type DeleteUserHandler struct {
 	useCase usecase.UserUseCase
 }
 
-func (h *NewUserHandler) CreateUser(c *gin.Context) {
-	var newUser entity.UserRequest
+func (h *DeleteUserHandler) Handle(c *gin.Context) {
+	userID := c.Param("id")
 
-	if err := c.ShouldBindBodyWithJSON(&newUser); err != nil {
-		c.JSON(400, entity.Response{
-			Succes:  false,
-			Message: err.Error(),
-		})
-		return
-	}
-
-	if err := h.useCase.CreateUser(newUser); err != nil {
+	if err := h.useCase.DeleteUser(userID); err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,
 			Message: err.Error(),
@@ -31,6 +23,6 @@ func (h *NewUserHandler) CreateUser(c *gin.Context) {
 
 	c.JSON(200, entity.Response{
 		Succes:  true,
-		Message: "User created",
+		Message: "User deleted",
 	})
 }

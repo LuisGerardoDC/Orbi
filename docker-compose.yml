@@ -8,6 +8,7 @@ services:
       - "50052:50052"
       - "8080:8080"
     depends_on:
+      - rabbitmq
       - notification-service
 
   notification-service:

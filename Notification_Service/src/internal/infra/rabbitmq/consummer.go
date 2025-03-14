@@ -2,6 +2,8 @@ package rabbitmq
 
 import (
 	"log"
+
+	"github.com/LuisGerardoDC/Orbi/NotificationService/src/internal/usecase"
 )
 
 func StartConsumer() {
@@ -18,6 +20,8 @@ func StartConsumer() {
 
 	for msg := range messages {
 		log.Printf("Mensaje recibido: %s", msg.Body)
-		// Aquí puedes agregar lógica para manejar el mensaje, como enviar una notificación
+		usecase := usecase.NotificationUseCase{}
+
+		usecase.SendNotification(string(msg.Body))
 	}
 }

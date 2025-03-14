@@ -25,6 +25,10 @@ services:
     ports:
       - "50051:50051"
     restart: always
+    environment:
+      - EMAIL_STORAGE_PATH=/Notification_Service/notifications 
+    volumes:
+      - ./Notification_Service/notifications:/Notification_Service/notifications
     depends_on:
       - rabbitmq
 

@@ -27,6 +27,8 @@ services:
     restart: always
     environment:
       - EMAIL_STORAGE_PATH=/Notification_Service/notifications 
+      - USER_SERVICE_URL=user-service
+      - USER_SERVICE_PORT=8080
     volumes:
       - ./Notification_Service/notifications:/Notification_Service/notifications
     depends_on:

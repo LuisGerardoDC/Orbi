@@ -1,12 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
-	pb "github.com/LuisGerardoDC/Orbi/NotificationService/src/api/proto"
+	"github.com/LuisGerardoDC/Orbi/NotificationService/src/api/proto"
+	notigrpc "github.com/LuisGerardoDC/Orbi/NotificationService/src/internal/infra/grpc"
 	"github.com/LuisGerardoDC/Orbi/NotificationService/src/internal/infra/rabbitmq"
-	"github.com/LuisGerardoDC/Orbi/NotificationService/src/internal/service"
 	"google.golang.org/grpc"
 )
 
@@ -15,16 +16,16 @@ func main() {
 		rabbitmq.StartConsumer()
 	}()
 
-	lis, err := net.Listen("tcp", ":50051")
+	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
-		log.Fatalf("Error al escuchar : %v", err)
+		log.Fatalf("Failed to listen: %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterNotificationServiceServer(grpcServer, &service.NotificationService{})
+	proto.RegisterNotificationServiceServer(grpcServer, &notigrpc.NotificationServer{})
 
-	log.Println("Servidor gRPC escuchando en el puerto 50051")
-	if err := grpcServer.Serve(lis); err != nil {
-		log.Fatalf("Error al iniciar servidor :%v", err)
+	fmt.Println("Notification Service running on port 50051...")
+	if err := grpcServer.Serve(listener); err != nil {
+		log.Fatalf("Failed to serve: %v", err)
 	}
 }

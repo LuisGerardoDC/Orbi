@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   user-service:
-    build: ./User_Service
+    build: ./User_Service/
     container_name: user-service
     ports:
       - "50052:50052"
@@ -10,9 +10,9 @@ services:
     environment:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
-      - MYSQL_USER=orbiappuser
-      - MYSQL_PASSWORD=apppassword
-      - MYSQL_DATABASE=usersdb
+      - MYSQL_USER=orbiapp
+      - MYSQL_PASSWORD=pass1234
+      - MYSQL_DATABASE=users
     depends_on:
       - mysql
       - rabbitmq
@@ -28,17 +28,18 @@ services:
 
   mysql:
     image: mysql:8
-    container_name: mysql
+    container_name: mysql_local
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD=rootpassword
-      MYSQL_DATABASE=usersdb
-      MYSQL_USER=orbiappuser
-      MYSQL_PASSWORD=apppassword
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=users
+      - MYSQL_USER=orbiapp
+      - MYSQL_PASSWORD=pass1234
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
 
   rabbitmq:
     image: "rabbitmq:3-management"

@@ -10,3 +10,5 @@ COPY . .
 RUN go build -o user-service ./src/cmd/server
 
 CMD ["/app/user-service"]
+
+EXPOSE 50052 8080

@@ -2,11 +2,20 @@ version: "3.8"
 
 services:
   user-service:
-    build: ./User_Service
+    build: ./User_Service/
     container_name: user-service
     ports:
       - "50052:50052"
+      - "8080:8080"
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=orbiapp
+      - MYSQL_PASSWORD=pass1234
+      - MYSQL_DATABASE=users
     depends_on:
+      - mysql
+      - rabbitmq
       - notification-service
 
   notification-service:
@@ -17,6 +26,21 @@ services:
     depends_on:
       - rabbitmq
 
+  mysql:
+    image: mysql:8
+    container_name: mysql_local
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpass
+      - MYSQL_DATABASE=users
+      - MYSQL_USER=orbiapp
+      - MYSQL_PASSWORD=pass1234
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
   rabbitmq:
     image: "rabbitmq:3-management"
     container_name: rabbitmq
@@ -24,3 +48,6 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+volumes:
+  mysql_data:
+    driver: local

@@ -1,47 +1,57 @@
 package usecase
 
 import (
-	"errors"
+	"database/sql"
 
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
 )
 
 type UserUseCase struct {
-	users map[string]entity.User
+	DB *sql.DB
 }
 
-func NewUserUseCase() *UserUseCase {
-	return &UserUseCase{users: make(map[string]entity.User)}
-}
+func (uc *UserUseCase) CreateUser(user entity.UserRequest) error {
+	insertQuery := `INSERT INTO users (username, email) VALUES (?, ?)`
 
-func (uc *UserUseCase) CreateUser(user entity.User) error {
-	if _, exists := uc.users[user.ID]; exists {
-		return errors.New("usuario ya existe")
+	_, err := uc.DB.Exec(insertQuery, user.Name, user.Email)
+	if err != nil {
+		return err
 	}
-	uc.users[user.ID] = user
 	return nil
 }
 
-func (uc *UserUseCase) GetUser(id string) (entity.User, error) {
-	user, exists := uc.users[id]
-	if !exists {
-		return entity.User{}, errors.New("usuario no encontrado")
+func (uc *UserUseCase) GetUser(id int) (*entity.User, error) {
+	var (
+		selectQuery = `SELECT id, username, email, deletedAt FROM users WHERE id = ?`
+		user        = entity.User{}
+	)
+
+	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.ID, &user.Name, &user.Email, &user.DeletedAt)
+	if err != nil {
+		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
-func (uc *UserUseCase) UpdateUser(user entity.User) error {
-	if _, exists := uc.users[user.ID]; !exists {
-		return errors.New("usuario no encontrado")
+func (uc *UserUseCase) UpdateUser(user entity.UserRequest) (*entity.User, error) {
+	updateQuery := `UPDATE users SET username = ?, email = ? WHERE id = ?`
+
+	_, err := uc.DB.Exec(updateQuery, user.Name, user.Email, user.ID)
+	if err != nil {
+		return nil, err
 	}
-	uc.users[user.ID] = user
-	return nil
+	return &entity.User{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }
 
-func (uc *UserUseCase) DeleteUser(id string) error {
-	if _, exists := uc.users[id]; !exists {
-		return errors.New("usuario no encontrado")
+func (uc *UserUseCase) DeleteUser(id int) (*entity.User, error) {
+	deleteQuery := `UPDATE users SET deletedAt = UTC_TIMESTAMP() WHERE id = ?`
+	_, err := uc.DB.Exec(deleteQuery, id)
+	if err != nil {
+		return nil, err
 	}
-	delete(uc.users, id)
-	return nil
+	return &entity.User{ID: id}, nil
 }

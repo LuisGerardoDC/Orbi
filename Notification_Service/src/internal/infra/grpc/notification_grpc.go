@@ -17,7 +17,6 @@ func NewNotificationServiceGRPC(useCase *usecase.NotificationUseCase) *Notificat
 }
 
 func (s *NotificationServiceGRPC) SendNotification(ctx context.Context, req *proto.NotificationRequest) (*proto.NotificationResponse, error) {
-	// Convertir los datos y pasarlos al caso de uso
 	notification := entity.Notification{Message: req.Message}
 	if err := s.useCase.SendNotification(notification); err != nil {
 		return nil, err

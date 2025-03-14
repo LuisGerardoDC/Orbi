@@ -1,42 +1,61 @@
 package rabbitmq
 
 import (
-	"log"
-
-	"github.com/LuisGerardoDC/Orbi/NotificationService/src/internal/domain/entity"
 	"github.com/streadway/amqp"
 )
 
 type RabbitMQ struct {
 	connection *amqp.Connection
+	channel    *amqp.Channel
+	queue      amqp.Queue
 }
 
 func NewRabbitMQ() (*RabbitMQ, error) {
 	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
 	if err != nil {
-		log.Fatalf("Error al conectar a RabbitMQ: %v", err)
 		return nil, err
 	}
-	return &RabbitMQ{connection: conn}, nil
+
+	ch, err := conn.Channel()
+	if err != nil {
+		conn.Close()
+		return nil, err
+	}
+
+	q, err := ch.QueueDeclare(
+		"notifications",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		ch.Close()
+		conn.Close()
+		return nil, err
+	}
+
+	return &RabbitMQ{connection: conn, channel: ch, queue: q}, nil
 }
 
-func (r *RabbitMQ) Publish(notification entity.Notification) error {
-	// Enviar la notificación a la cola de RabbitMQ
-	ch, err := r.connection.Channel()
-	if err != nil {
-		return err
-	}
-	defer ch.Close()
-
-	err = ch.Publish(
-		"",      // exchange
-		"queue", // routing key
-		false,   // mandatory
-		false,   // immediate
-		amqp.Publishing{
-			ContentType: "text/plain",
-			Body:        []byte(notification.Message),
-		},
+func (r *RabbitMQ) ConsumeMessages() (<-chan amqp.Delivery, error) {
+	messages, err := r.channel.Consume(
+		r.queue.Name,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
 	)
-	return err
+	if err != nil {
+		return nil, err
+	}
+	return messages, nil
+}
+
+func (r *RabbitMQ) Close() {
+	r.channel.Close()
+	r.connection.Close()
 }

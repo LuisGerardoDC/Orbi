@@ -14,7 +14,8 @@ func NewNotificationUseCase(rabbitMQ rabbitmq.RabbitMQ) *NotificationUseCase {
 }
 
 func (uc *NotificationUseCase) SendNotification(notification entity.Notification) error {
-	// Lógica de negocio, puede involucrar validaciones o transformaciones
-	return uc.rabbitMQ.Publish(notification)
+
+	// Guardar mensajes en un archivo
+	return nil
 
 }

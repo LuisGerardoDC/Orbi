@@ -1,15 +1,19 @@
 package handlers
 
 import (
+	"encoding/json"
+	"log"
 	"strconv"
 
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/app/usecase"
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
+	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/infra/rabbitmq"
 	"github.com/gin-gonic/gin"
 )
 
 type DeleteUserHandler struct {
 	useCase usecase.UserUseCase
+	rabbit  *rabbitmq.RabbitMQ
 }
 
 func (h *DeleteUserHandler) Handle(c *gin.Context) {
@@ -31,6 +35,22 @@ func (h *DeleteUserHandler) Handle(c *gin.Context) {
 			Message: err.Error(),
 		})
 		return
+	}
+
+	rabbitMesage := entity.Message{
+		User:   *user,
+		Action: "delete",
+	}
+
+	jsonBytes, err := json.Marshal(rabbitMesage)
+	if err != nil {
+		log.Printf("Error marshalling user: %s", err)
+	}
+	message := string(jsonBytes)
+
+	err = h.rabbit.PublishMessage(message)
+	if err != nil {
+		log.Printf("Error publishing message: %s", err)
 	}
 
 	c.JSON(200, entity.Response{

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notification;
 
-option go_package = "github.com/LuisGerardoDC/Orbi/NotificationService/src/api/proto";
+option go_package = "proto/notificationpb";
 
 service NotificationService {
   rpc SendNotification (NotificationRequest) returns (NotificationResponse);

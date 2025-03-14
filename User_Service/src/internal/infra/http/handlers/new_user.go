@@ -1,11 +1,9 @@
 package handlers
 
 import (
-	"encoding/json"
-	"log"
-
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/app/usecase"
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
+	usergrcp "github.com/LuisGerardoDC/Orbi/UserService/src/internal/infra/grcp"
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/infra/rabbitmq"
 	"github.com/gin-gonic/gin"
 )
@@ -35,20 +33,7 @@ func (h *NewUserHandler) Handle(c *gin.Context) {
 		return
 	}
 
-	rabbitMesage := entity.Message{
-		User:   *user,
-		Action: "create",
-	}
-	jsonBytes, err := json.Marshal(rabbitMesage)
-	if err != nil {
-		log.Printf("Error marshalling user: %s", err)
-	}
-	message := string(jsonBytes)
-
-	err = h.rabbit.PublishMessage(message)
-	if err != nil {
-		log.Printf("Error publishing message: %s", err)
-	}
+	go usergrcp.NotifyUserCreated(user.ID)
 
 	c.JSON(200, entity.Response{
 		Succes:  true,

@@ -21,7 +21,8 @@ func (h *UpdateUserHandler) Handle(c *gin.Context) {
 		return
 	}
 
-	if err := h.useCase.UpdateUser(newUser); err != nil {
+	user, err := h.useCase.UpdateUser(newUser)
+	if err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,
 			Message: err.Error(),
@@ -31,6 +32,7 @@ func (h *UpdateUserHandler) Handle(c *gin.Context) {
 
 	c.JSON(200, entity.Response{
 		Succes:  true,
-		Message: "User created",
+		Message: "User Updated",
+		User:    user,
 	})
 }

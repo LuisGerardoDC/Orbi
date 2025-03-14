@@ -11,7 +11,7 @@ type UserUseCase struct {
 }
 
 func (uc *UserUseCase) CreateUser(user entity.UserRequest) error {
-	insertQuery := `INSERT INTO users (name, email) VALUES ($1, $2)`
+	insertQuery := `INSERT INTO users (username, email) VALUES (?, ?)`
 
 	_, err := uc.DB.Exec(insertQuery, user.Name, user.Email)
 	if err != nil {
@@ -20,34 +20,38 @@ func (uc *UserUseCase) CreateUser(user entity.UserRequest) error {
 	return nil
 }
 
-func (uc *UserUseCase) GetUser(id string) (*entity.User, error) {
+func (uc *UserUseCase) GetUser(id int) (*entity.User, error) {
 	var (
-		selectQuery = `SELECT name, email FROM users WHERE userid = $1`
+		selectQuery = `SELECT id, username, email, deletedAt FROM users WHERE id = ?`
 		user        = entity.User{}
 	)
 
-	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.Name, &user.Email)
+	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.ID, &user.Name, &user.Email, &user.DeletedAt)
 	if err != nil {
 		return nil, err
 	}
 	return &user, nil
 }
 
-func (uc *UserUseCase) UpdateUser(user entity.UserRequest) error {
-	updateQuery := `UPDATE users SET name = $1, email = $2 WHERE userid = $3`
+func (uc *UserUseCase) UpdateUser(user entity.UserRequest) (*entity.User, error) {
+	updateQuery := `UPDATE users SET username = ?, email = ? WHERE id = ?`
 
 	_, err := uc.DB.Exec(updateQuery, user.Name, user.Email, user.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &entity.User{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }
 
-func (uc *UserUseCase) DeleteUser(id string) error {
-	deleteQuery := `UPDATE users SET deleted_at = UTC_TIMESTAMP() WHERE userid = $1`
+func (uc *UserUseCase) DeleteUser(id int) (*entity.User, error) {
+	deleteQuery := `UPDATE users SET deletedAt = UTC_TIMESTAMP() WHERE id = ?`
 	_, err := uc.DB.Exec(deleteQuery, id)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &entity.User{ID: id}, nil
 }

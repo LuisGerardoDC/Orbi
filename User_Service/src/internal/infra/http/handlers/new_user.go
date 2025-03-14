@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/app/usecase"
@@ -24,8 +25,9 @@ func (h *NewUserHandler) Handle(c *gin.Context) {
 		})
 		return
 	}
+	user, err := h.useCase.CreateUser(newUser)
 
-	if err := h.useCase.CreateUser(newUser); err != nil {
+	if err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,
 			Message: err.Error(),
@@ -33,8 +35,17 @@ func (h *NewUserHandler) Handle(c *gin.Context) {
 		return
 	}
 
-	message := "User created" + newUser.Name
-	err := h.rabbit.PublishMessage(message)
+	rabbitMesage := entity.Message{
+		User:   *user,
+		Action: "create",
+	}
+	jsonBytes, err := json.Marshal(rabbitMesage)
+	if err != nil {
+		log.Printf("Error marshalling user: %s", err)
+	}
+	message := string(jsonBytes)
+
+	err = h.rabbit.PublishMessage(message)
 	if err != nil {
 		log.Printf("Error publishing message: %s", err)
 	}

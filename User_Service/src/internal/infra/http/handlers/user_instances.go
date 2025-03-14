@@ -27,9 +27,11 @@ var (
 
 	ImpUpdateUserHandler = UpdateUserHandler{
 		useCase: userUseCases,
+		rabbit:  rabbit,
 	}
 
 	ImpDeleteUserHandler = DeleteUserHandler{
 		useCase: userUseCases,
+		rabbit:  rabbit,
 	}
 )

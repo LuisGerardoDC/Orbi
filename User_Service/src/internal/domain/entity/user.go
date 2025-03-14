@@ -1,8 +1,10 @@
 package entity
 
+import "time"
+
 type User struct {
-	ID        int
-	Name      string
-	Email     string
-	DeletedAt string
+	ID        int        `json:"id,omitempty"`
+	Name      string     `json:"name,omitempty"`
+	Email     string     `json:"email,omitempty"`
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
 }

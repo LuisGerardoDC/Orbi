@@ -10,14 +10,17 @@ type UserUseCase struct {
 	DB *sql.DB
 }
 
-func (uc *UserUseCase) CreateUser(user entity.UserRequest) error {
+func (uc *UserUseCase) CreateUser(user entity.UserRequest) (*entity.User, error) {
 	insertQuery := `INSERT INTO users (username, email) VALUES (?, ?)`
 
 	_, err := uc.DB.Exec(insertQuery, user.Name, user.Email)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return &entity.User{
+		Name:  user.Name,
+		Email: user.Email,
+	}, nil
 }
 
 func (uc *UserUseCase) GetUser(id int) (*entity.User, error) {

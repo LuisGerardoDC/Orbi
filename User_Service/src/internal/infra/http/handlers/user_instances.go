@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	// database
+	// services
 	dbConnection = utils.ConnectDB()
+	rabbit       = utils.GetRabbitMQ()
 
 	// UseCase
 	userUseCases = usecase.UserUseCase{
@@ -17,6 +18,7 @@ var (
 	// Handlers
 	ImpNewUserHandler = NewUserHandler{
 		useCase: userUseCases,
+		rabbit:  rabbit,
 	}
 
 	ImpGetUserHandler = GetUserHandler{

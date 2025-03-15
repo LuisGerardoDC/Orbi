@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -44,5 +45,24 @@ func TestDeleteHandler_Success(t *testing.T) {
 	handler.Handle(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
+	mockUseCase.AssertExpectations(t)
+}
+
+func TestDeleteHandler_Nouser(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockUseCase := new(usecase.MockUserUseCase)
+	userID := 1
+	mockUseCase.On("DeleteUser", userID).Return(nil, errors.New("No user"))
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Params = []gin.Param{{Key: "id", Value: strconv.Itoa(userID)}}
+
+	handler := handlers.DeleteUserHandler{
+		UseCase: mockUseCase,
+	}
+	handler.Handle(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
 	mockUseCase.AssertExpectations(t)
 }

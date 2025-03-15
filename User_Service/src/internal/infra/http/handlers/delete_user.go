@@ -12,7 +12,7 @@ import (
 )
 
 type DeleteUserHandler struct {
-	useCase usecase.UserUseCase
+	useCase usecase.InterfaceUserUseCase
 	rabbit  *rabbitmq.RabbitMQ
 }
 

@@ -11,7 +11,7 @@ var (
 	rabbit       = utils.GetRabbitMQ()
 
 	// UseCase
-	userUseCases = usecase.UserUseCase{
+	userUseCases = &usecase.UserUseCase{
 		DB: dbConnection,
 	}
 
@@ -22,7 +22,7 @@ var (
 	}
 
 	ImpGetUserHandler = GetUserHandler{
-		useCase: userUseCases,
+		UseCase: userUseCases,
 	}
 
 	ImpUpdateUserHandler = UpdateUserHandler{

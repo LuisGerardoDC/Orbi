@@ -11,7 +11,7 @@ import (
 )
 
 type UpdateUserHandler struct {
-	useCase usecase.UserUseCase
+	useCase usecase.InterfaceUserUseCase
 	rabbit  *rabbitmq.RabbitMQ
 }
 

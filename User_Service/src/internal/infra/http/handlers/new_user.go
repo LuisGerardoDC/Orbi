@@ -9,7 +9,7 @@ import (
 )
 
 type NewUserHandler struct {
-	useCase usecase.UserUseCase
+	useCase usecase.InterfaceUserUseCase
 	rabbit  *rabbitmq.RabbitMQ
 }
 

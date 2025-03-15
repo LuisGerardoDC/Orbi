@@ -17,8 +17,7 @@ var (
 
 	// Handlers
 	ImpNewUserHandler = NewUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
 	}
 
 	ImpGetUserHandler = GetUserHandler{
@@ -26,12 +25,12 @@ var (
 	}
 
 	ImpUpdateUserHandler = UpdateUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
+		Rabbit:  rabbit,
 	}
 
 	ImpDeleteUserHandler = DeleteUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
+		Rabbit:  rabbit,
 	}
 )

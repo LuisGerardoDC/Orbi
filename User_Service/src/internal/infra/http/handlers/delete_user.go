@@ -12,8 +12,8 @@ import (
 )
 
 type DeleteUserHandler struct {
-	useCase usecase.InterfaceUserUseCase
-	rabbit  *rabbitmq.RabbitMQ
+	UseCase usecase.InterfaceUserUseCase
+	Rabbit  rabbitmq.InterfaecRabbitMQ
 }
 
 func (h *DeleteUserHandler) Handle(c *gin.Context) {
@@ -27,7 +27,7 @@ func (h *DeleteUserHandler) Handle(c *gin.Context) {
 		return
 
 	}
-	user, err := h.useCase.DeleteUser(userIDInt)
+	user, err := h.UseCase.DeleteUser(userIDInt)
 
 	if err != nil {
 		c.JSON(500, entity.Response{
@@ -48,7 +48,7 @@ func (h *DeleteUserHandler) Handle(c *gin.Context) {
 	}
 	message := string(jsonBytes)
 
-	err = h.rabbit.PublishMessage(message)
+	err = h.Rabbit.PublishMessage(message)
 	if err != nil {
 		log.Printf("Error publishing message: %s", err)
 	}

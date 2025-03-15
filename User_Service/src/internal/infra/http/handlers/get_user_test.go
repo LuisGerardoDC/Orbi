@@ -1,6 +1,7 @@
 package handlers_test
 
 import (
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -14,7 +15,6 @@ import (
 )
 
 func TestGetUserHandler_Success(t *testing.T) {
-
 	gin.SetMode(gin.TestMode)
 	mockUseCase := new(usecase.MockUserUseCase)
 	userID := 1
@@ -30,4 +30,35 @@ func TestGetUserHandler_Success(t *testing.T) {
 
 	assert.Equal(t, http.StatusOK, w.Code)
 	mockUseCase.AssertExpectations(t)
+}
+
+func TestGetUserHandler_UserNotFound(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockUseCase := new(usecase.MockUserUseCase)
+	userID := 2
+	mockUseCase.On("GetUser", userID).Return(nil, errors.New("user not found"))
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Params = []gin.Param{{Key: "id", Value: strconv.Itoa(userID)}}
+
+	handler := handlers.GetUserHandler{UseCase: mockUseCase}
+	handler.Handle(c)
+
+	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	mockUseCase.AssertExpectations(t)
+}
+
+func TestGetUserHandler_InvalidID(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	mockUseCase := new(usecase.MockUserUseCase)
+
+	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Params = []gin.Param{{Key: "id", Value: "invalid"}}
+
+	handler := handlers.GetUserHandler{UseCase: mockUseCase}
+	handler.Handle(c)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
 }

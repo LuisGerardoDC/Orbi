@@ -14,6 +14,7 @@ services:
       - MYSQL_USER=orbiapp
       - MYSQL_PASSWORD=pass1234
       - MYSQL_DATABASE=users
+      - ENABLE_MQ=true
     depends_on:
       - mysql
       - rabbitmq

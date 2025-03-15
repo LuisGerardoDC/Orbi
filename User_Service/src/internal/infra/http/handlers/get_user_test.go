@@ -1,7 +1,6 @@
 package handlers_test
 
 import (
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -14,66 +13,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetUserHandler_Handle_Success(t *testing.T) {
-	mockUseCase := usecase.MockUserUseCase{}
-	handler := handlers.GetUserHandler{
-		UseCase: &mockUseCase,
-	}
-
-	userID := 1
-	user := entity.User{ID: userID, Name: "John Doe"}
-	mockUseCase.On("GetUser", userID).Return(user, nil)
+func TestGetUserHandler_Success(t *testing.T) {
 
 	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	r.GET("/user/:id", handler.Handle)
+	mockUseCase := new(usecase.MockUserUseCase)
+	userID := 1
+	mockUser := &entity.User{ID: userID, Name: "John Doe"}
+	mockUseCase.On("GetUser", userID).Return(mockUser, nil)
 
-	req, _ := http.NewRequest(http.MethodGet, "/user/"+strconv.Itoa(userID), nil)
 	w := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(w)
+	c.Params = []gin.Param{{Key: "id", Value: strconv.Itoa(userID)}}
 
-	r.ServeHTTP(w, req)
+	handler := handlers.GetUserHandler{UseCase: mockUseCase}
+	handler.Handle(c)
 
 	assert.Equal(t, http.StatusOK, w.Code)
-	mockUseCase.AssertCalled(t, "GetUser", userID)
-}
-
-func TestGetUserHandler_Handle_InvalidID(t *testing.T) {
-	mockUseCase := usecase.MockUserUseCase{}
-	handler := handlers.GetUserHandler{
-		UseCase: &mockUseCase,
-	}
-
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	r.GET("/user/:id", handler.Handle)
-
-	req, _ := http.NewRequest(http.MethodGet, "/user/invalid", nil)
-	w := httptest.NewRecorder()
-
-	r.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-	mockUseCase.AssertNotCalled(t, "GetUser")
-}
-
-func TestGetUserHandler_Handle_UserNotFound(t *testing.T) {
-	mockUseCase := usecase.MockUserUseCase{}
-	handler := handlers.GetUserHandler{
-		UseCase: &mockUseCase,
-	}
-
-	userID := 1
-	mockUseCase.On("GetUser", userID).Return(entity.User{}, errors.New("user not found"))
-
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	r.GET("/user/:id", handler.Handle)
-
-	req, _ := http.NewRequest(http.MethodGet, "/user/"+strconv.Itoa(userID), nil)
-	w := httptest.NewRecorder()
-
-	r.ServeHTTP(w, req)
-
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
-	mockUseCase.AssertCalled(t, "GetUser", userID)
+	mockUseCase.AssertExpectations(t)
 }

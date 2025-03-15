@@ -1,5 +1,31 @@
 # Orbi Techtest
 
+## Descripción del flujo de comunicación entre servicios
+
+## Resumen
+Comportamiento de la interaccion entre  **UserService** y **NotificationService**. Se detallan las acciones que se realizan al llamar a los microservicios, prerequisitos, instalacion, ejecucion 
+
+## Flujo de proceso
+
+### 1. Crear Usuario - `POST /user-service/user/`
+Cuando se realiza una solicitud **POST** al endpoint `/user-service/user/` con un cuerpo en formato JSON para crear un nuevo usuario, se ejecutan las siguientes acciones:
+
+- El usuario se **añade a la base de datos** del servicio UserService.
+- Se envía una **notificación por medio de gRPC** al servicio **NotificationService**.
+- El servicio NotificationService, al recibir la notificación, consulta el endpoint **GET `/user-service/user/:id`** para obtener los datos del usuario recién creado.
+- Una vez obtenidos los datos, NotificationService simula el envío de un correo electrónico:
+  - Si la carpeta `Notification_Service/notification/carpetanueva` no existe, **se crea automáticamente**.
+  - Se genera un archivo **HTML** con el contenido del "email" y se guarda dentro de la carpeta mencionada.
+
+### 2. Actualización o Eliminación de Usuario - `DELETE /user-service/user/:id` o `PUT /user-service/user/`
+Cuando se realiza una solicitud **DELETE** `/user-service/user/:id` o **PUT** a `/user-service/user/`, se lleva a cabo el siguiente proceso:
+
+- Se actualiza o marca como eliminado en la base de datos
+- Se **envía un mensaje de actualización** (ya sea eliminación o modificación) a **RabbitMQ**.
+- El servicio **NotificationService** consume del mensaje enviado en RabbitMQ.
+- Al recibir el mensaje, NotificationService realiza un **log del mensaje recibido**, procesando la actualización o eliminación del usuario según el caso.
+
+
 ## Servicios
 - **User Service**
 - **Notification Service**

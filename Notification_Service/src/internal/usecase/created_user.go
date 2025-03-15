@@ -27,11 +27,26 @@ func (uc *NotificationNewUser) SendNotification(user entity.User) error {
 	fileName := fmt.Sprintf("%s_%s.html", "new user", time.Now().Format("2006-01-02T15:04:05"))
 	filePath := filepath.Join(dirPath, fileName)
 
-	template := fmt.Sprintf("<h1>Bienvenido %d</h1>", user.ID)
+	template := getNewUserTemplate(user)
 	err = os.WriteFile(filePath, []byte(template), os.ModePerm)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func getNewUserTemplate(user entity.User) string {
+	return fmt.Sprintf(`
+<html>
+<head>
+    <title>Bienvenido</title>
+</head>
+<body>
+    <h1>¡Bienvenido, %s!</h1>
+    <p>Tu cuenta ha sido creada exitosamente.</p>
+    <p><strong>Correo electrónico:</strong> %s</p>
+</body>
+</html>
+`, user.Name, user.Email)
 }

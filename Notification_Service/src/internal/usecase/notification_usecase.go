@@ -41,7 +41,19 @@ func (uc *NotificationUseCase) SendNotification(notification string) error {
 		return err
 	}
 
-	return nil
+	logPath := os.Getenv("LOG_PATH")
+	err = os.MkdirAll(logPath, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(fmt.Sprintf("%slogs.txt", logPath), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+	_, err = file.WriteString(fmt.Sprintln(notification))
+
+	return err
 }
 
 func getTemplate(message entity.Message) string {

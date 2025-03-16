@@ -11,8 +11,8 @@ import (
 )
 
 type UpdateUserHandler struct {
-	useCase usecase.UserUseCase
-	rabbit  *rabbitmq.RabbitMQ
+	UseCase usecase.InterfaceUserUseCase
+	Rabbit  rabbitmq.InterfaecRabbitMQ
 }
 
 func (h *UpdateUserHandler) Handle(c *gin.Context) {
@@ -26,7 +26,7 @@ func (h *UpdateUserHandler) Handle(c *gin.Context) {
 		return
 	}
 
-	user, err := h.useCase.UpdateUser(newUser)
+	user, err := h.UseCase.UpdateUser(newUser)
 	if err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,
@@ -45,7 +45,7 @@ func (h *UpdateUserHandler) Handle(c *gin.Context) {
 	}
 	message := string(jsonBytes)
 
-	err = h.rabbit.PublishMessage(message)
+	err = h.Rabbit.PublishMessage(message)
 	if err != nil {
 		log.Printf("Error publishing message: %s", err)
 	}

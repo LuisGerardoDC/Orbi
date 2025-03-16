@@ -4,13 +4,11 @@ import (
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/app/usecase"
 	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/domain/entity"
 	usergrcp "github.com/LuisGerardoDC/Orbi/UserService/src/internal/infra/grcp"
-	"github.com/LuisGerardoDC/Orbi/UserService/src/internal/infra/rabbitmq"
 	"github.com/gin-gonic/gin"
 )
 
 type NewUserHandler struct {
-	useCase usecase.UserUseCase
-	rabbit  *rabbitmq.RabbitMQ
+	UseCase usecase.InterfaceUserUseCase
 }
 
 func (h *NewUserHandler) Handle(c *gin.Context) {
@@ -23,7 +21,7 @@ func (h *NewUserHandler) Handle(c *gin.Context) {
 		})
 		return
 	}
-	user, err := h.useCase.CreateUser(newUser)
+	user, err := h.UseCase.CreateUser(newUser)
 
 	if err != nil {
 		c.JSON(500, entity.Response{

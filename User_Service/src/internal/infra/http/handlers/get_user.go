@@ -9,7 +9,7 @@ import (
 )
 
 type GetUserHandler struct {
-	useCase usecase.UserUseCase
+	UseCase usecase.InterfaceUserUseCase
 }
 
 func (h *GetUserHandler) Handle(c *gin.Context) {
@@ -24,7 +24,7 @@ func (h *GetUserHandler) Handle(c *gin.Context) {
 
 	}
 
-	user, err := h.useCase.GetUser(userIDInt)
+	user, err := h.UseCase.GetUser(userIDInt)
 	if err != nil {
 		c.JSON(500, entity.Response{
 			Succes:  false,

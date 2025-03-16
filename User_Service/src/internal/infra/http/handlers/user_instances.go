@@ -11,27 +11,26 @@ var (
 	rabbit       = utils.GetRabbitMQ()
 
 	// UseCase
-	userUseCases = usecase.UserUseCase{
+	userUseCases = &usecase.UserUseCase{
 		DB: dbConnection,
 	}
 
 	// Handlers
 	ImpNewUserHandler = NewUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
 	}
 
 	ImpGetUserHandler = GetUserHandler{
-		useCase: userUseCases,
+		UseCase: userUseCases,
 	}
 
 	ImpUpdateUserHandler = UpdateUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
+		Rabbit:  rabbit,
 	}
 
 	ImpDeleteUserHandler = DeleteUserHandler{
-		useCase: userUseCases,
-		rabbit:  rabbit,
+		UseCase: userUseCases,
+		Rabbit:  rabbit,
 	}
 )

@@ -31,11 +31,10 @@ func (uc *UserUseCase) CreateUser(user entity.UserRequest) (*entity.User, error)
 
 func (uc *UserUseCase) GetUser(id int) (*entity.User, error) {
 	var (
-		selectQuery = `SELECT id, username, email, deletedAt FROM users WHERE id = ?`
+		selectQuery = `SELECT id, username, email FROM users WHERE id = ?`
 		user        = entity.User{}
 	)
-
-	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.ID, &user.Name, &user.Email, &user.DeletedAt)
+	err := uc.DB.QueryRow(selectQuery, id).Scan(&user.ID, &user.Name, &user.Email)
 	if err != nil {
 		return nil, err
 	}

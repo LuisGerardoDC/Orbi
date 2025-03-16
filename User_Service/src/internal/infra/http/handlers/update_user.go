@@ -12,7 +12,7 @@ import (
 
 type UpdateUserHandler struct {
 	UseCase usecase.InterfaceUserUseCase
-	Rabbit  *rabbitmq.RabbitMQ
+	Rabbit  rabbitmq.InterfaecRabbitMQ
 }
 
 func (h *UpdateUserHandler) Handle(c *gin.Context) {
